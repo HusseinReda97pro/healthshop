@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const app = express();
 const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb+srv://admin:xeztcTwr5SD2xtZN@healthshop.xnh7m.mongodb.net";
@@ -16,7 +17,7 @@ const port = process.env.PORT || 5000;
 
 
 
-// app.use(bodyParser.json());
+app.use(bodyParser.json());
 
 // app.use(express.urlencoded({ extended: true }));
 
@@ -46,6 +47,24 @@ app.get('/branches', (req, res) => {
     }
 });
 
+app.get('/branches', (req, res) => {
+    try {
+        client.connect(async (err) => {
+            const collection = await client.db("health_shop").collection('branches').find({})
+                .toArray(function (err, result) {
+                    if (err) throw err;
+                    res.send(result);
+                })
+            // // perform actions on the collection object
+            // console.log(collection);
+            // res.send(collection);
+        });
+    } catch (e) {
+        console.log('error');
+        res.send([]);
+    }
+})
+
 app.get('/branches/:id', (req, res) => {
     try {
         client.connect(async (err) => {
@@ -64,12 +83,12 @@ app.get('/branches/:id', (req, res) => {
     }
 })
 
-app.get('/add/:branch', (req, res) => {
+app.post('/branch', (req, res) => {
     try {
         client.connect(err => {
             const x = client.db("health_shop")
                 .collection("branches")
-                .insertOne({ name: req.params.branch });
+                .insertOne({ name: req.body.branch });
             // const collection = client.db("health_shop").collection("brnches").findOne({});
             // // perform actions on the collection object
             // console.log(x);
