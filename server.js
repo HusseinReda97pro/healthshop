@@ -9,7 +9,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 app.use(cors())
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 // if(process.env.NODE_ENV === 'production'){
 //     app.use(express.static(path.join(__dirname, 'build')));
@@ -119,6 +119,30 @@ app.get('/addbrancheData', (req, res) => {
         console.log('error');
     }
 });
+
+app.post('/dayvalues', (req, res) => {
+    try {
+        client.connect(async (err) => {
+            const collection = await client.db("health_shop").collection(req.body.branch_id).updateOne({
+                'date': req.body.date
+            }, {
+                '$set': {
+                    'in': req.body.inside,
+                    'out': req.body.outside,
+                    'total_in': req.body.total_inside
+                }
+            }, { upsert: true })
+            res.send('Done');
+
+            // // perform actions on the collection object
+            // console.log(collection);
+            // res.send(collection);
+        });
+    } catch (e) {
+        console.log('error');
+        res.send([]);
+    }
+})
 
 
 // app.get('/api',(req: express.Request, res: express.Response)=>{
